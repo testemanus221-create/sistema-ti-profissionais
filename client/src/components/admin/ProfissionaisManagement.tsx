@@ -26,21 +26,23 @@ export default function ProfissionaisManagement() {
     { enabled: !!filters.cidade_id }
   );
 
-  const { data: tecnicos = [], isLoading, refetch } = trpc.tecnicos.listDisponibles.useQuery({
+  const utils = trpc.useUtils();
+  const { data: tecnicos = [], isLoading } = trpc.tecnicos.listDisponibles.useQuery({
     area_id: filters.area_id && filters.area_id !== "0" ? parseInt(filters.area_id) : undefined,
     estado_id: filters.estado_id && filters.estado_id !== "0" ? parseInt(filters.estado_id) : undefined,
     cidade_id: filters.cidade_id && filters.cidade_id !== "0" ? parseInt(filters.cidade_id) : undefined,
     municipio_id: filters.municipio_id && filters.municipio_id !== "0" ? parseInt(filters.municipio_id) : undefined,
   });
 
-  const deleteMutation = trpc.tecnicos.delete.useMutation();
+  const deleteMutation = trpc.tecnicos.delete.useMutation({
+    onSuccess: () => utils.tecnicos.listDisponibles.invalidate(),
+  });
 
   const handleDelete = async (id: number) => {
     if (!confirm("Tem certeza que deseja deletar este profissional?")) return;
     try {
       await deleteMutation.mutateAsync({ id });
       toast.success("Profissional deletado com sucesso");
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao deletar profissional");
     }

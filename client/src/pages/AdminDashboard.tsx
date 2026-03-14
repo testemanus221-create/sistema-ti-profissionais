@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Briefcase, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,10 +16,14 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("areas");
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await logout();
     navigate("/");
-  };
+  }, [logout, navigate]);
+
+  const handleTabChange = useCallback((tabId: string) => {
+    setActiveTab(tabId);
+  }, []);
 
   const tabs = [
     { id: "areas", label: "Áreas de Atuação" },
@@ -52,7 +56,7 @@ export default function AdminDashboard() {
           {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`w-full text-left px-4 py-2 rounded transition-colors ${
                 activeTab === tab.id
                   ? 'bg-blue-600'

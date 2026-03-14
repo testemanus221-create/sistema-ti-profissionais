@@ -15,11 +15,18 @@ export default function MunicipiosManagement() {
   const [nome, setNome] = useState("");
   const [cidadeId, setCidadeId] = useState("");
 
+  const utils = trpc.useUtils();
   const { data: cidades = [] } = trpc.cidades.list.useQuery();
-  const { data: municipios = [], refetch } = trpc.municipios.list.useQuery();
-  const createMutation = trpc.municipios.create.useMutation();
-  const updateMutation = trpc.municipios.update.useMutation();
-  const deleteMutation = trpc.municipios.delete.useMutation();
+  const { data: municipios = [] } = trpc.municipios.list.useQuery();
+  const createMutation = trpc.municipios.create.useMutation({
+    onSuccess: () => utils.municipios.list.invalidate(),
+  });
+  const updateMutation = trpc.municipios.update.useMutation({
+    onSuccess: () => utils.municipios.list.invalidate(),
+  });
+  const deleteMutation = trpc.municipios.delete.useMutation({
+    onSuccess: () => utils.municipios.list.invalidate(),
+  });
 
   const handleSubmit = async () => {
     if (!nome.trim() || !cidadeId) {
@@ -46,7 +53,6 @@ export default function MunicipiosManagement() {
       setCidadeId("");
       setEditingId(null);
       setIsOpen(false);
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao salvar município");
     }
@@ -64,7 +70,6 @@ export default function MunicipiosManagement() {
     try {
       await deleteMutation.mutateAsync({ id });
       toast.success("Município deletado com sucesso");
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao deletar município");
     }

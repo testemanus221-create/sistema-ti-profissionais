@@ -15,11 +15,18 @@ export default function CidadesManagement() {
   const [nome, setNome] = useState("");
   const [estadoId, setEstadoId] = useState("");
 
+  const utils = trpc.useUtils();
   const { data: estados = [] } = trpc.estados.list.useQuery();
-  const { data: cidades = [], refetch } = trpc.cidades.list.useQuery();
-  const createMutation = trpc.cidades.create.useMutation();
-  const updateMutation = trpc.cidades.update.useMutation();
-  const deleteMutation = trpc.cidades.delete.useMutation();
+  const { data: cidades = [] } = trpc.cidades.list.useQuery();
+  const createMutation = trpc.cidades.create.useMutation({
+    onSuccess: () => utils.cidades.list.invalidate(),
+  });
+  const updateMutation = trpc.cidades.update.useMutation({
+    onSuccess: () => utils.cidades.list.invalidate(),
+  });
+  const deleteMutation = trpc.cidades.delete.useMutation({
+    onSuccess: () => utils.cidades.list.invalidate(),
+  });
 
   const handleSubmit = async () => {
     if (!nome.trim() || !estadoId) {
@@ -46,7 +53,6 @@ export default function CidadesManagement() {
       setEstadoId("");
       setEditingId(null);
       setIsOpen(false);
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao salvar cidade");
     }
@@ -64,7 +70,6 @@ export default function CidadesManagement() {
     try {
       await deleteMutation.mutateAsync({ id });
       toast.success("Cidade deletada com sucesso");
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao deletar cidade");
     }

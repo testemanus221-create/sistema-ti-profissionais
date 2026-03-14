@@ -14,10 +14,17 @@ export default function EstadosManagement() {
   const [nome, setNome] = useState("");
   const [uf, setUf] = useState("");
 
-  const { data: estados = [], refetch } = trpc.estados.list.useQuery();
-  const createMutation = trpc.estados.create.useMutation();
-  const updateMutation = trpc.estados.update.useMutation();
-  const deleteMutation = trpc.estados.delete.useMutation();
+  const utils = trpc.useUtils();
+  const { data: estados = [] } = trpc.estados.list.useQuery();
+  const createMutation = trpc.estados.create.useMutation({
+    onSuccess: () => utils.estados.list.invalidate(),
+  });
+  const updateMutation = trpc.estados.update.useMutation({
+    onSuccess: () => utils.estados.list.invalidate(),
+  });
+  const deleteMutation = trpc.estados.delete.useMutation({
+    onSuccess: () => utils.estados.list.invalidate(),
+  });
 
   const handleSubmit = async () => {
     if (!nome.trim() || !uf.trim()) {
@@ -37,7 +44,6 @@ export default function EstadosManagement() {
       setUf("");
       setEditingId(null);
       setIsOpen(false);
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao salvar estado");
     }
@@ -55,7 +61,6 @@ export default function EstadosManagement() {
     try {
       await deleteMutation.mutateAsync({ id });
       toast.success("Estado deletado com sucesso");
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao deletar estado");
     }

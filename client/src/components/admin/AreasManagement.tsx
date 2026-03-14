@@ -13,10 +13,17 @@ export default function AreasManagement() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [nome, setNome] = useState("");
 
-  const { data: areas = [], refetch } = trpc.areas.list.useQuery();
-  const createMutation = trpc.areas.create.useMutation();
-  const updateMutation = trpc.areas.update.useMutation();
-  const deleteMutation = trpc.areas.delete.useMutation();
+  const utils = trpc.useUtils();
+  const { data: areas = [] } = trpc.areas.list.useQuery();
+  const createMutation = trpc.areas.create.useMutation({
+    onSuccess: () => utils.areas.list.invalidate(),
+  });
+  const updateMutation = trpc.areas.update.useMutation({
+    onSuccess: () => utils.areas.list.invalidate(),
+  });
+  const deleteMutation = trpc.areas.delete.useMutation({
+    onSuccess: () => utils.areas.list.invalidate(),
+  });
 
   const handleSubmit = async () => {
     if (!nome.trim()) {
@@ -35,7 +42,6 @@ export default function AreasManagement() {
       setNome("");
       setEditingId(null);
       setIsOpen(false);
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao salvar área");
     }
@@ -52,7 +58,6 @@ export default function AreasManagement() {
     try {
       await deleteMutation.mutateAsync({ id });
       toast.success("Área deletada com sucesso");
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Erro ao deletar área");
     }
