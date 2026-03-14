@@ -35,42 +35,36 @@ function ProtectedRoute({ component: Component, requiredRole }: { component: Rea
   return <Component />;
 }
 
-function Router() {
-  const { user, loading } = useAuth();
+// Componentes de rota estáveis (não funções inline)
+function AdminRoute() {
+  return <ProtectedRoute component={AdminDashboard} requiredRole="admin" />;
+}
 
-  if (loading) {
+function TecnicoRoute() {
+  return <ProtectedRoute component={TecnicoDashboard} />;
+}
+
+function ProfissionaisRoute() {
+  return <ProtectedRoute component={Profissionais} requiredRole="admin" />;
+}
+
+function Router() {
+  if (true) { // Sempre renderizar todas as rotas
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={40} />
-      </div>
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/login"} component={Login} />
+        <Route path={"/register"} component={Register} />
+        <Route path={"/admin"} component={AdminRoute} />
+        <Route path={"/admin/*"} component={AdminRoute} />
+        <Route path={"/profissionais"} component={ProfissionaisRoute} />
+        <Route path={"/dashboard"} component={TecnicoRoute} />
+        <Route path={"/dashboard/*"} component={TecnicoRoute} />
+        <Route path={"/404"} component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
     );
   }
-
-  return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/login"} component={Login} />
-      <Route path={"/register"} component={Register} />
-      
-      {user?.role === 'admin' && (
-        <>
-          <Route path={"/admin"} component={() => <ProtectedRoute component={AdminDashboard} requiredRole="admin" />} />
-          <Route path={"/admin/*"} component={() => <ProtectedRoute component={AdminDashboard} requiredRole="admin" />} />
-          <Route path={"/profissionais"} component={Profissionais} />
-        </>
-      )}
-      
-      {user && user.role !== 'admin' && (
-        <>
-          <Route path={"/dashboard"} component={() => <ProtectedRoute component={TecnicoDashboard} />} />
-          <Route path={"/dashboard/*"} component={() => <ProtectedRoute component={TecnicoDashboard} />} />
-        </>
-      )}
-
-      <Route path={"/404"} component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
-  );
 }
 
 function App() {
