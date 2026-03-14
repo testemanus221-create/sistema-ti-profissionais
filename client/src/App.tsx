@@ -54,6 +54,7 @@ function Router() {
       
       {user?.role === 'admin' && (
         <>
+          <Route path={"/admin"} component={() => <ProtectedRoute component={AdminDashboard} requiredRole="admin" />} />
           <Route path={"/admin/*"} component={() => <ProtectedRoute component={AdminDashboard} requiredRole="admin" />} />
           <Route path={"/profissionais"} component={Profissionais} />
         </>

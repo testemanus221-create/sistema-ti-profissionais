@@ -107,3 +107,4 @@
 - [x] Impedir técnicos de ver outros técnicos
 - [x] Impedir técnicos de usar busca de profissionais
 - [x] Corrigir painel admin que não está abrindo
+- [x] Corrigir rota /admin retornando 404
