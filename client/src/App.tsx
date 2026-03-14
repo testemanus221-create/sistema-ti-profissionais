@@ -58,7 +58,10 @@ function Router() {
       )}
       
       {user && user.role !== 'admin' && (
-        <Route path={"/dashboard/*"} component={() => <ProtectedRoute component={TecnicoDashboard} />} />
+        <>
+          <Route path={"/dashboard"} component={() => <ProtectedRoute component={TecnicoDashboard} />} />
+          <Route path={"/dashboard/*"} component={() => <ProtectedRoute component={TecnicoDashboard} />} />
+        </>
       )}
 
       <Route path={"/404"} component={NotFound} />

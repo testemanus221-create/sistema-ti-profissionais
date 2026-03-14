@@ -95,3 +95,4 @@
 
 ## Bugs Encontrados
 - [x] Corrigir erro de controlled/uncontrolled input no TecnicoDashboard
+- [x] Corrigir rota /dashboard retornando 404

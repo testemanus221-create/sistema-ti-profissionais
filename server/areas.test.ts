@@ -46,6 +46,13 @@ function createUserContext(): TrpcContext {
   };
 }
 
+// Gerar UF aleatório único (2 letras)
+function generateUniqueUF(): string {
+  const char1 = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  const char2 = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  return `${char1}${char2}`;
+}
+
 describe("Areas Management", () => {
   let adminCaller: ReturnType<typeof appRouter.createCaller>;
   let userCaller: ReturnType<typeof appRouter.createCaller>;
@@ -136,9 +143,10 @@ describe("Estados Management", () => {
 
   it("should create estado as admin", async () => {
     const timestamp = Date.now();
+    const uf = generateUniqueUF();
     const estado = await adminCaller.estados.create({
       nome_estado: `São Paulo ${timestamp}`,
-      uf: `A${Math.floor(Math.random() * 10)}`,
+      uf: uf,
     });
     expect(estado).toBeDefined();
     expect(estado.nome_estado).toContain("São Paulo");
@@ -151,19 +159,19 @@ describe("Estados Management", () => {
 
   it("should update estado", async () => {
     const timestamp = Date.now();
-    const randomUf = `B${Math.floor(Math.random() * 10)}`;
+    const uf = generateUniqueUF();
     const created = await adminCaller.estados.create({
       nome_estado: `Minas Gerais ${timestamp}`,
-      uf: randomUf,
+      uf: uf,
     });
 
     const updated = await adminCaller.estados.update({
       id: created.id,
       nome_estado: `Minas Gerais ${timestamp}`,
-      uf: randomUf,
+      uf: uf,
     });
 
-    expect(updated.uf).toBe(randomUf);
+    expect(updated.uf).toBe(uf);
   });
 });
 
@@ -174,10 +182,10 @@ describe("Cidades Management", () => {
   beforeAll(async () => {
     adminCaller = appRouter.createCaller(createAdminContext());
     const timestamp = Date.now();
-    const randomUf = `C${Math.floor(Math.random() * 10)}`;
+    const uf = generateUniqueUF();
     const estado = await adminCaller.estados.create({
       nome_estado: `Rio de Janeiro ${timestamp}`,
-      uf: randomUf,
+      uf: uf,
     });
     estadoId = estado.id;
   });
@@ -207,10 +215,10 @@ describe("Municipios Management", () => {
   beforeAll(async () => {
     adminCaller = appRouter.createCaller(createAdminContext());
     const timestamp = Date.now();
-    const randomUf = `D${Math.floor(Math.random() * 10)}`;
+    const uf = generateUniqueUF();
     const estado = await adminCaller.estados.create({
       nome_estado: `Bahia ${timestamp}`,
-      uf: randomUf,
+      uf: uf,
     });
     const cidade = await adminCaller.cidades.create({
       estado_id: estado.id,
