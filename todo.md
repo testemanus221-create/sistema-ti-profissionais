@@ -118,6 +118,7 @@
 - [x] Corrigir página de cadastro de técnico exigindo autenticação
 - [x] Implementar sistema completo de cadastro com senha para técnico
 - [x] Adicionar campo de senha no formulário de registro
-- [ ] Implementar autenticação por email/senha
-- [ ] Criar função de login por email/senha
+- [x] Implementar autenticação por email/senha
+- [x] Criar função de login por email/senha
 - [x] Corrigir erro de controlled/uncontrolled input no Register.tsx
+- [x] Corrigir redirecionamento após cadastro de técnico (404 no /dashboard)

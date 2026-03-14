@@ -84,8 +84,8 @@ export default function Register() {
         whatsapp: data.whatsapp.replace(/\D/g, ''),
         municipios_ids: data.municipios_ids,
       });
-      toast.success("Cadastro realizado com sucesso!");
-      navigate("/dashboard");
+      toast.success("Cadastro realizado com sucesso! Faça login para continuar.");
+      navigate("/login");
     } catch (error: any) {
       toast.error(error.message || "Erro ao cadastrar");
     }

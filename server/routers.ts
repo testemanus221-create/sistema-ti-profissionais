@@ -25,6 +25,40 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    loginEmail: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        senha: z.string().min(6),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const user = await db.getUserByEmail(input.email);
+        if (!user || !user.passwordHash) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Email ou senha incorretos',
+          });
+        }
+
+        const crypto = await import('crypto');
+        const senhaHash = crypto.createHash('sha256').update(input.senha).digest('hex');
+        if (user.passwordHash !== senhaHash) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'Email ou senha incorretos',
+          });
+        }
+
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        const sessionData = { userId: user.id, openId: user.openId };
+        const jose = await import('jose');
+        const token = await new jose.SignJWT(sessionData)
+          .setProtectedHeader({ alg: 'HS256' })
+          .setExpirationTime('7d')
+          .sign(new TextEncoder().encode(process.env.JWT_SECRET || 'secret'));
+        ctx.res.setHeader('Set-Cookie', `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=604800`);
+        
+        return { success: true, user };
+      }),
   }),
 
   // ============ AREAS ============
