@@ -251,6 +251,7 @@ export const appRouter = router({
       .input(z.object({
         nome: z.string().min(1, "Nome é obrigatório"),
         email: z.string().email("Email inválido"),
+        senha: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
         area_id: z.number(),
         estado_id: z.number(),
         cidade_id: z.number(),
@@ -262,6 +263,7 @@ export const appRouter = router({
         return await db.createTecnicoPublic(
           input.nome,
           input.email,
+          input.senha,
           input.area_id,
           input.estado_id,
           input.cidade_id,

@@ -116,3 +116,7 @@
 - [x] Popular banco com cidades e municípios reais
 - [x] Corrigir erro ao deletar estado com cidades relacionadas
 - [x] Corrigir página de cadastro de técnico exigindo autenticação
+- [x] Implementar sistema completo de cadastro com senha para técnico
+- [x] Adicionar campo de senha no formulário de registro
+- [ ] Implementar autenticação por email/senha
+- [ ] Criar função de login por email/senha

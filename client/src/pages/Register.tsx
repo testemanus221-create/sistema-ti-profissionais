@@ -18,11 +18,16 @@ const whatsappRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
 const registerSchema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   email: z.string().email("Email inválido"),
+  senha: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  confirmarSenha: z.string().min(6, "Confirme sua senha"),
   area_id: z.string().min(1, "Selecione uma área de atuação"),
   estado_id: z.string().min(1, "Selecione um estado"),
   cidade_id: z.string().min(1, "Selecione uma cidade"),
   whatsapp: z.string().regex(whatsappRegex, "WhatsApp deve estar no formato (XX) XXXXX-XXXX"),
   municipios_ids: z.array(z.number()).optional(),
+}).refine((data) => data.senha === data.confirmarSenha, {
+  message: "As senhas não conferem",
+  path: ["confirmarSenha"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -61,6 +66,7 @@ export default function Register() {
       await createTecnico.mutateAsync({
         nome: data.nome,
         email: data.email,
+        senha: data.senha,
         area_id: parseInt(data.area_id),
         estado_id: parseInt(data.estado_id),
         cidade_id: parseInt(data.cidade_id),
@@ -124,6 +130,42 @@ export default function Register() {
                   )}
                 />
                 {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+              </div>
+
+              {/* Senha */}
+              <div className="space-y-2">
+                <Label htmlFor="senha">Senha</Label>
+                <Controller
+                  name="senha"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="Mínimo 6 caracteres"
+                      className={errors.senha ? "border-red-500" : ""}
+                    />
+                  )}
+                />
+                {errors.senha && <p className="text-sm text-red-500">{errors.senha.message}</p>}
+              </div>
+
+              {/* Confirmar Senha */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmarSenha">Confirmar Senha</Label>
+                <Controller
+                  name="confirmarSenha"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="Confirme sua senha"
+                      className={errors.confirmarSenha ? "border-red-500" : ""}
+                    />
+                  )}
+                />
+                {errors.confirmarSenha && <p className="text-sm text-red-500">{errors.confirmarSenha.message}</p>}
               </div>
 
               {/* Área de Atuação */}

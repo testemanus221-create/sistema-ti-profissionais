@@ -324,6 +324,7 @@ export async function getTecnicosDisponiveis(filters?: {
 export async function createTecnicoPublic(
   nome: string,
   email: string,
+  senha: string,
   area_id: number,
   estado_id: number,
   cidade_id: number,
@@ -333,11 +334,16 @@ export async function createTecnicoPublic(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Hash da senha (usar bcrypt em produção)
+  const crypto = await import('crypto');
+  const passwordHash = crypto.createHash('sha256').update(senha).digest('hex');
+  
   // Criar usuário com dados do técnico
   const userResult = await db.insert(users).values({
     openId: `tecnico-${Date.now()}-${Math.random().toString(36).substring(7)}`,
     name: nome,
     email: email,
+    passwordHash: passwordHash,
     loginMethod: 'email',
     role: 'user',
   });
