@@ -96,3 +96,13 @@
 ## Bugs Encontrados
 - [x] Corrigir erro de controlled/uncontrolled input no TecnicoDashboard
 - [x] Corrigir rota /dashboard retornando 404
+
+
+## Ajustes de Visibilidade (Nova Requisição)
+- [x] Remover busca de técnicos da tela pública
+- [x] Remover lista de profissionais da tela pública
+- [x] Deixar tela pública com apenas login, cadastro e informações básicas
+- [x] Mover busca de técnicos para painel admin
+- [x] Implementar verificação de permissão para acesso ao painel admin
+- [x] Impedir técnicos de ver outros técnicos
+- [x] Impedir técnicos de usar busca de profissionais

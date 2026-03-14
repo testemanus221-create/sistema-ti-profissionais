@@ -18,9 +18,6 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-slate-900">TechConnect</h1>
           </div>
           <nav className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate("/profissionais")}>
-              Profissionais
-            </Button>
             {isAuthenticated ? (
               <>
                 {user?.role === 'admin' ? (
@@ -54,12 +51,20 @@ export default function Home() {
               Encontre especialistas qualificados em redes, suporte, desenvolvimento, infraestrutura e segurança. Gerenciamento simples e eficiente para suas necessidades tecnológicas.
             </p>
             <div className="flex gap-4">
-              <Button size="lg" onClick={() => navigate("/profissionais")}>
-                Buscar Profissionais
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/register")}>
-                Cadastre-se como Técnico
-              </Button>
+              {isAuthenticated && user?.role === 'admin' ? (
+                <Button size="lg" onClick={() => navigate("/admin")}>
+                  Ir para Painel Admin
+                </Button>
+              ) : (
+                <Button size="lg" onClick={() => navigate("/register")}>
+                  Cadastre-se como Técnico
+                </Button>
+              )}
+              {!isAuthenticated && (
+                <Button size="lg" variant="outline" onClick={() => navigate("/login")}>
+                  Fazer Login
+                </Button>
+              )}
             </div>
           </div>
           <div className="relative">

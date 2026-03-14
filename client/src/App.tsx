@@ -49,12 +49,14 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/profissionais"} component={Profissionais} />
       <Route path={"/login"} component={Login} />
       <Route path={"/register"} component={Register} />
       
       {user?.role === 'admin' && (
-        <Route path={"/admin/*"} component={() => <ProtectedRoute component={AdminDashboard} requiredRole="admin" />} />
+        <>
+          <Route path={"/admin/*"} component={() => <ProtectedRoute component={AdminDashboard} requiredRole="admin" />} />
+          <Route path={"/profissionais"} component={Profissionais} />
+        </>
       )}
       
       {user && user.role !== 'admin' && (

@@ -11,7 +11,34 @@ import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function Profissionais() {
   const [, navigate] = useLocation();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // Redirecionar se não for admin
+  if (!loading && (!user || user.role !== 'admin')) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+        <Card className="border-0 shadow-lg">
+          <CardContent className="py-12 text-center">
+            <p className="text-slate-600 text-lg mb-4">
+              Acesso restrito. Apenas administradores podem acessar esta página.
+            </p>
+            <Button onClick={() => navigate("/")}>
+              Voltar para Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+      </div>
+    );
+  }
+
   const [filters, setFilters] = useState({
     area_id: "",
     estado_id: "",
