@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM tecnico_municipios WHERE tecnico_id IN (SELECT id FROM tecnicos WHERE usuario_id IN (SELECT id FROM users WHERE email = 'fgnass98@gmail.com'));\nDELETE FROM tecnicos WHERE usuario_id IN (SELECT id FROM users WHERE email = 'fgnass98@gmail.com');\nDELETE FROM users WHERE email = 'fgnass98@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user qp5xGh74A2pnCCm.root --database hfWdEoR2VQDjiKHRQ6AEZz --execute DELETE FROM tecnico_municipios WHERE tecnico_id IN (SELECT id FROM tecnicos WHERE usuario_id IN (SELECT id FROM users WHERE email = 'fgnass98@gmail.com'));\nDELETE FROM tecnicos WHERE usuario_id IN (SELECT id FROM users WHERE email = 'fgnass98@gmail.com');\nDELETE FROM users WHERE email = 'fgnass98@gmail.com';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 108
+}

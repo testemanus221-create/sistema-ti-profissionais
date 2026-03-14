@@ -124,3 +124,6 @@
 - [x] Corrigir redirecionamento após cadastro de técnico (404 no /dashboard)
 - [x] Corrigir erro de INSERT ao cadastrar técnico (campo name incompleto)
 - [x] Corrigir erro de login "Email ou senha incorretos"
+- [x] Corrigir erro de login "Email ou senha incorretos" (hash não bate)
+- [x] Corrigir erro de cadastro com email duplicado (constraint UNIQUE não está sendo capturada)
+- [x] Limpar dados de teste do banco de dados
