@@ -305,7 +305,8 @@ export const appRouter = router({
             input.municipios_ids,
           );
         } catch (error: any) {
-          if (error.message?.includes('UNIQUE') || error.message?.includes('Duplicate')) {
+          const errorMsg = String(error.message || error).toLowerCase();
+          if (errorMsg.includes('unique') || errorMsg.includes('duplicate') || errorMsg.includes('email')) {
             throw new TRPCError({
               code: 'CONFLICT',
               message: 'Este email já está cadastrado. Faça login para continuar.',
