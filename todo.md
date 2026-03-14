@@ -120,3 +120,4 @@
 - [x] Adicionar campo de senha no formulário de registro
 - [ ] Implementar autenticação por email/senha
 - [ ] Criar função de login por email/senha
+- [x] Corrigir erro de controlled/uncontrolled input no Register.tsx

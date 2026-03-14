@@ -43,6 +43,17 @@ export default function Register() {
   const [, navigate] = useLocation();
   const { control, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      nome: '',
+      email: '',
+      senha: '',
+      confirmarSenha: '',
+      area_id: '',
+      estado_id: '',
+      cidade_id: '',
+      whatsapp: '',
+      municipios_ids: [],
+    },
   });
 
   const estadoId = watch("estado_id");
