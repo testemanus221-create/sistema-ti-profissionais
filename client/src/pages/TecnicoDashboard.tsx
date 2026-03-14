@@ -31,6 +31,7 @@ export default function TecnicoDashboard() {
     email: "",
     municipios_ids: [] as number[],
   });
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const { data: tecnico, refetch } = trpc.tecnicos.me.useQuery();
   const { data: areas } = trpc.areas.list.useQuery();
@@ -48,7 +49,7 @@ export default function TecnicoDashboard() {
   const toggleMutation = trpc.tecnicos.toggleDisponibilidade.useMutation();
 
   useEffect(() => {
-    if (tecnico) {
+    if (tecnico && !isLoaded) {
       setFormData({
         area_id: tecnico.area_id?.toString() || "",
         estado_id: tecnico.estado_id?.toString() || "",
@@ -57,8 +58,9 @@ export default function TecnicoDashboard() {
         email: tecnico.email || "",
         municipios_ids: tecnico.municipios?.map((m: any) => m.id) || [],
       });
+      setIsLoaded(true);
     }
-  }, [tecnico]);
+  }, [tecnico, isLoaded]);
 
   const handleSave = async () => {
     try {
@@ -208,7 +210,7 @@ export default function TecnicoDashboard() {
                 <div className="space-y-2">
                   <Label>Email</Label>
                   <Input
-                    value={formData.email}
+                    value={formData.email || ""}
                     disabled
                     className="bg-slate-50"
                   />
@@ -218,7 +220,7 @@ export default function TecnicoDashboard() {
                 <div className="space-y-2">
                   <Label>Área de Atuação</Label>
                   <Select 
-                    value={formData.area_id} 
+                    value={formData.area_id || ""} 
                     onValueChange={(value) => setFormData({ ...formData, area_id: value })}
                     disabled={!isEditing}
                   >
@@ -239,7 +241,7 @@ export default function TecnicoDashboard() {
                 <div className="space-y-2">
                   <Label>Estado</Label>
                   <Select 
-                    value={formData.estado_id} 
+                    value={formData.estado_id || ""} 
                     onValueChange={(value) => setFormData({ ...formData, estado_id: value, cidade_id: "", municipios_ids: [] })}
                     disabled={!isEditing}
                   >
@@ -260,7 +262,7 @@ export default function TecnicoDashboard() {
                 <div className="space-y-2">
                   <Label>Cidade</Label>
                   <Select 
-                    value={formData.cidade_id} 
+                    value={formData.cidade_id || ""} 
                     onValueChange={(value) => setFormData({ ...formData, cidade_id: value, municipios_ids: [] })}
                     disabled={!isEditing || !formData.estado_id}
                   >
@@ -314,7 +316,7 @@ export default function TecnicoDashboard() {
                 <div className="space-y-2">
                   <Label>WhatsApp</Label>
                   <Input
-                    value={formData.whatsapp}
+                    value={formData.whatsapp || ""}
                     onChange={(e) => {
                       const formatted = formatWhatsApp(e.target.value);
                       setFormData({ ...formData, whatsapp: formatted });

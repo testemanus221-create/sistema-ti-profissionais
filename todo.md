@@ -91,3 +91,7 @@
 - [ ] Popular dados iniciais (estados, cidades, etc)
 - [x] Criar checkpoint final
 - [ ] Entregar sistema funcional
+
+
+## Bugs Encontrados
+- [x] Corrigir erro de controlled/uncontrolled input no TecnicoDashboard

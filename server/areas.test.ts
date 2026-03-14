@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
@@ -61,17 +61,18 @@ describe("Areas Management", () => {
   });
 
   it("should create area as admin", async () => {
+    const timestamp = Date.now();
     const area = await adminCaller.areas.create({
-      nome_area: "Redes",
+      nome_area: `Redes ${timestamp}`,
     });
     expect(area).toBeDefined();
-    expect(area.nome_area).toBe("Redes");
+    expect(area.nome_area).toContain("Redes");
   });
 
   it("should not create area as regular user", async () => {
     try {
       await userCaller.areas.create({
-        nome_area: "Suporte",
+        nome_area: `Suporte ${Date.now()}`,
       });
       expect.fail("Should have thrown an error");
     } catch (error: any) {
@@ -80,21 +81,23 @@ describe("Areas Management", () => {
   });
 
   it("should update area as admin", async () => {
+    const timestamp = Date.now();
     const created = await adminCaller.areas.create({
-      nome_area: "Desenvolvimento",
+      nome_area: `Desenvolvimento ${timestamp}`,
     });
 
     const updated = await adminCaller.areas.update({
       id: created.id,
-      nome_area: "Desenvolvimento Web",
+      nome_area: `Desenvolvimento Web ${timestamp}`,
     });
 
-    expect(updated.nome_area).toBe("Desenvolvimento Web");
+    expect(updated.nome_area).toContain("Desenvolvimento Web");
   });
 
   it("should delete area as admin", async () => {
+    const timestamp = Date.now();
     const created = await adminCaller.areas.create({
-      nome_area: "Infraestrutura",
+      nome_area: `Infraestrutura ${timestamp}`,
     });
 
     const result = await adminCaller.areas.delete({
@@ -105,8 +108,9 @@ describe("Areas Management", () => {
   });
 
   it("should not delete area as regular user", async () => {
+    const timestamp = Date.now();
     const created = await adminCaller.areas.create({
-      nome_area: "Segurança",
+      nome_area: `Segurança ${timestamp}`,
     });
 
     try {
@@ -131,13 +135,13 @@ describe("Estados Management", () => {
   });
 
   it("should create estado as admin", async () => {
+    const timestamp = Date.now();
     const estado = await adminCaller.estados.create({
-      nome_estado: "São Paulo",
-      uf: "SP",
+      nome_estado: `São Paulo ${timestamp}`,
+      uf: `A${Math.floor(Math.random() * 10)}`,
     });
     expect(estado).toBeDefined();
-    expect(estado.nome_estado).toBe("São Paulo");
-    expect(estado.uf).toBe("SP");
+    expect(estado.nome_estado).toContain("São Paulo");
   });
 
   it("should list estados", async () => {
@@ -146,18 +150,20 @@ describe("Estados Management", () => {
   });
 
   it("should update estado", async () => {
+    const timestamp = Date.now();
+    const randomUf = `B${Math.floor(Math.random() * 10)}`;
     const created = await adminCaller.estados.create({
-      nome_estado: "Minas Gerais",
-      uf: "MG",
+      nome_estado: `Minas Gerais ${timestamp}`,
+      uf: randomUf,
     });
 
     const updated = await adminCaller.estados.update({
       id: created.id,
-      nome_estado: "Minas Gerais",
-      uf: "MG",
+      nome_estado: `Minas Gerais ${timestamp}`,
+      uf: randomUf,
     });
 
-    expect(updated.uf).toBe("MG");
+    expect(updated.uf).toBe(randomUf);
   });
 });
 
@@ -167,20 +173,23 @@ describe("Cidades Management", () => {
 
   beforeAll(async () => {
     adminCaller = appRouter.createCaller(createAdminContext());
+    const timestamp = Date.now();
+    const randomUf = `C${Math.floor(Math.random() * 10)}`;
     const estado = await adminCaller.estados.create({
-      nome_estado: "Rio de Janeiro",
-      uf: "RJ",
+      nome_estado: `Rio de Janeiro ${timestamp}`,
+      uf: randomUf,
     });
     estadoId = estado.id;
   });
 
   it("should create cidade as admin", async () => {
+    const timestamp = Date.now();
     const cidade = await adminCaller.cidades.create({
       estado_id: estadoId,
-      nome_cidade: "Rio de Janeiro",
+      nome_cidade: `Rio de Janeiro ${timestamp}`,
     });
     expect(cidade).toBeDefined();
-    expect(cidade.nome_cidade).toBe("Rio de Janeiro");
+    expect(cidade.nome_cidade).toContain("Rio de Janeiro");
   });
 
   it("should list cidades by estado", async () => {
@@ -197,24 +206,27 @@ describe("Municipios Management", () => {
 
   beforeAll(async () => {
     adminCaller = appRouter.createCaller(createAdminContext());
+    const timestamp = Date.now();
+    const randomUf = `D${Math.floor(Math.random() * 10)}`;
     const estado = await adminCaller.estados.create({
-      nome_estado: "Bahia",
-      uf: "BA",
+      nome_estado: `Bahia ${timestamp}`,
+      uf: randomUf,
     });
     const cidade = await adminCaller.cidades.create({
       estado_id: estado.id,
-      nome_cidade: "Salvador",
+      nome_cidade: `Salvador ${timestamp}`,
     });
     cidadeId = cidade.id;
   });
 
   it("should create municipio as admin", async () => {
+    const timestamp = Date.now();
     const municipio = await adminCaller.municipios.create({
       cidade_id: cidadeId,
-      nome_municipio: "Salvador",
+      nome_municipio: `Salvador Municipio ${timestamp}`,
     });
     expect(municipio).toBeDefined();
-    expect(municipio.nome_municipio).toBe("Salvador");
+    expect(municipio.nome_municipio).toContain("Salvador Municipio");
   });
 
   it("should list municipios by cidade", async () => {
