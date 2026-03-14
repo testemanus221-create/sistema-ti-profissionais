@@ -114,3 +114,4 @@
 - [x] Popular banco com áreas de atuação reais de TI
 - [x] Popular banco com estados brasileiros reais
 - [x] Popular banco com cidades e municípios reais
+- [x] Corrigir erro ao deletar estado com cidades relacionadas

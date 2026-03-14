@@ -173,6 +173,13 @@ export async function updateEstado(id: number, nome_estado: string, uf: string):
 export async function deleteEstado(id: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // Verificar se há cidades relacionadas
+  const cidadesRelacionadas = await db.select().from(cidades).where(eq(cidades.estado_id, id)).limit(1);
+  if (cidadesRelacionadas.length > 0) {
+    throw new Error("Não é possível deletar este estado pois existem cidades relacionadas. Remova as cidades primeiro.");
+  }
+  
   await db.delete(estados).where(eq(estados.id, id));
 }
 
@@ -212,6 +219,13 @@ export async function updateCidade(id: number, estado_id: number, nome_cidade: s
 export async function deleteCidade(id: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // Verificar se há municípios relacionados
+  const municipiosRelacionados = await db.select().from(municipios).where(eq(municipios.cidade_id, id)).limit(1);
+  if (municipiosRelacionados.length > 0) {
+    throw new Error("Não é possível deletar esta cidade pois existem municípios relacionados. Remova os municípios primeiro.");
+  }
+  
   await db.delete(cidades).where(eq(cidades.id, id));
 }
 
