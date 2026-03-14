@@ -1,10 +1,20 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import * as db from "./db";
+
+// Middleware para verificar se é admin
+const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.user.role !== 'admin') {
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado. Apenas administradores.' });
+  }
+  return next({ ctx });
+});
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -17,12 +27,309 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  // ============ AREAS ============
+  areas: router({
+    list: publicProcedure.query(async () => {
+      return db.getAreas();
+    }),
+
+    create: adminProcedure
+      .input(z.object({ nome_area: z.string().min(1, "Nome da área é obrigatório") }))
+      .mutation(async ({ input }) => {
+        try {
+          return await db.createArea(input.nome_area);
+        } catch (error: any) {
+          if (error.message?.includes('UNIQUE')) {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'Essa área de atuação já existe',
+            });
+          }
+          throw error;
+        }
+      }),
+
+    update: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        nome_area: z.string().min(1, "Nome da área é obrigatório"),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          return await db.updateArea(input.id, input.nome_area);
+        } catch (error: any) {
+          if (error.message?.includes('UNIQUE')) {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'Essa área de atuação já existe',
+            });
+          }
+          throw error;
+        }
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteArea(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============ ESTADOS ============
+  estados: router({
+    list: publicProcedure.query(async () => {
+      return db.getEstados();
+    }),
+
+    create: adminProcedure
+      .input(z.object({
+        nome_estado: z.string().min(1, "Nome do estado é obrigatório"),
+        uf: z.string().length(2, "UF deve ter 2 caracteres").toUpperCase(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          return await db.createEstado(input.nome_estado, input.uf);
+        } catch (error: any) {
+          if (error.message?.includes('UNIQUE')) {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'Esse estado ou UF já existe',
+            });
+          }
+          throw error;
+        }
+      }),
+
+    update: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        nome_estado: z.string().min(1, "Nome do estado é obrigatório"),
+        uf: z.string().length(2, "UF deve ter 2 caracteres").toUpperCase(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          return await db.updateEstado(input.id, input.nome_estado, input.uf);
+        } catch (error: any) {
+          if (error.message?.includes('UNIQUE')) {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'Esse estado ou UF já existe',
+            });
+          }
+          throw error;
+        }
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteEstado(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============ CIDADES ============
+  cidades: router({
+    list: publicProcedure
+      .input(z.object({ estado_id: z.number().optional() }).optional())
+      .query(async ({ input }) => {
+        return db.getCidades(input?.estado_id);
+      }),
+
+    create: adminProcedure
+      .input(z.object({
+        estado_id: z.number(),
+        nome_cidade: z.string().min(1, "Nome da cidade é obrigatório"),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createCidade(input.estado_id, input.nome_cidade);
+      }),
+
+    update: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        estado_id: z.number(),
+        nome_cidade: z.string().min(1, "Nome da cidade é obrigatório"),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.updateCidade(input.id, input.estado_id, input.nome_cidade);
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteCidade(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============ MUNICIPIOS ============
+  municipios: router({
+    list: publicProcedure
+      .input(z.object({ cidade_id: z.number().optional() }).optional())
+      .query(async ({ input }) => {
+        return db.getMunicipios(input?.cidade_id);
+      }),
+
+    create: adminProcedure
+      .input(z.object({
+        cidade_id: z.number(),
+        nome_municipio: z.string().min(1, "Nome do município é obrigatório"),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createMunicipio(input.cidade_id, input.nome_municipio);
+      }),
+
+    update: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        cidade_id: z.number(),
+        nome_municipio: z.string().min(1, "Nome do município é obrigatório"),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.updateMunicipio(input.id, input.cidade_id, input.nome_municipio);
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteMunicipio(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============ TECNICOS ============
+  tecnicos: router({
+    // Listar técnicos disponíveis com filtros (público)
+    listDisponibles: publicProcedure
+      .input(z.object({
+        area_id: z.number().optional(),
+        estado_id: z.number().optional(),
+        cidade_id: z.number().optional(),
+        municipio_id: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const tecnicos = await db.getTecnicosDisponiveis(input);
+        // Enriquecer com dados relacionados
+        return Promise.all(tecnicos.map(async (tecnico) => {
+          const area = await db.getAreaById(tecnico.area_id);
+          const estado = await db.getEstadoById(tecnico.estado_id);
+          const cidade = await db.getCidadeById(tecnico.cidade_id);
+          const municipios = await db.getTecnicoMunicipios(tecnico.id);
+          return {
+            ...tecnico,
+            area: area?.nome_area,
+            estado: estado?.nome_estado,
+            cidade: cidade?.nome_cidade,
+            municipios: municipios.map(m => m.nome_municipio),
+          };
+        }));
+      }),
+
+    // Obter dados do técnico logado
+    me: protectedProcedure.query(async ({ ctx }) => {
+      const tecnico = await db.getTecnicoByUsuarioId(ctx.user.id);
+      if (!tecnico) return null;
+
+      const area = await db.getAreaById(tecnico.area_id);
+      const estado = await db.getEstadoById(tecnico.estado_id);
+      const cidade = await db.getCidadeById(tecnico.cidade_id);
+      const municipios = await db.getTecnicoMunicipios(tecnico.id);
+
+      return {
+        ...tecnico,
+        area: area?.nome_area,
+        estado: estado?.nome_estado,
+        cidade: cidade?.nome_cidade,
+        municipios: municipios.map(m => ({ id: m.id, nome: m.nome_municipio })),
+      };
+    }),
+
+    // Criar novo técnico (durante cadastro)
+    create: publicProcedure
+      .input(z.object({
+        nome: z.string().min(1, "Nome é obrigatório"),
+        email: z.string().email("Email inválido"),
+        area_id: z.number(),
+        estado_id: z.number(),
+        cidade_id: z.number(),
+        whatsapp: z.string().min(10, "WhatsApp inválido"),
+        municipios_ids: z.array(z.number()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Verificar se usuário já existe
+        if (!ctx.user) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'Você precisa estar autenticado',
+          });
+        }
+
+        const existingTecnico = await db.getTecnicoByUsuarioId(ctx.user.id);
+        if (existingTecnico) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Você já possui um cadastro como técnico',
+          });
+        }
+
+        return await db.createTecnico(
+          ctx.user.id,
+          input.area_id,
+          input.estado_id,
+          input.cidade_id,
+          input.whatsapp,
+          input.email,
+          input.municipios_ids,
+        );
+      }),
+
+    // Atualizar dados do técnico (apenas próprios dados)
+    update: protectedProcedure
+      .input(z.object({
+        area_id: z.number().optional(),
+        estado_id: z.number().optional(),
+        cidade_id: z.number().optional(),
+        whatsapp: z.string().min(10, "WhatsApp inválido").optional(),
+        email: z.string().email("Email inválido").optional(),
+        municipios_ids: z.array(z.number()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const tecnico = await db.getTecnicoByUsuarioId(ctx.user.id);
+        if (!tecnico) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Técnico não encontrado',
+          });
+        }
+
+        return await db.updateTecnico(tecnico.id, input);
+      }),
+
+    // Alternar disponibilidade
+    toggleDisponibilidade: protectedProcedure.mutation(async ({ ctx }) => {
+      const tecnico = await db.getTecnicoByUsuarioId(ctx.user.id);
+      if (!tecnico) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Técnico não encontrado',
+        });
+      }
+
+      return await db.updateTecnico(tecnico.id, {
+        disponivel: !tecnico.disponivel,
+      });
+    }),
+
+    // Deletar técnico (admin only)
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteTecnico(input.id);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

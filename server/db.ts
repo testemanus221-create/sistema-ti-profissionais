@@ -1,6 +1,21 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users,
+  areas,
+  estados,
+  cidades,
+  municipios,
+  tecnicos,
+  tecnico_municipios,
+  type Area,
+  type Estado,
+  type Cidade,
+  type Municipio,
+  type Tecnico,
+  type TecnicoMunicipio,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +104,307 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============ AREAS ============
+
+export async function getAreas(): Promise<Area[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(areas).orderBy(areas.nome_area);
+}
+
+export async function getAreaById(id: number): Promise<Area | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(areas).where(eq(areas.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createArea(nome_area: string): Promise<Area> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(areas).values({ nome_area });
+  const id = result[0].insertId as number;
+  return getAreaById(id) as Promise<Area>;
+}
+
+export async function updateArea(id: number, nome_area: string): Promise<Area> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(areas).set({ nome_area }).where(eq(areas.id, id));
+  return getAreaById(id) as Promise<Area>;
+}
+
+export async function deleteArea(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(areas).where(eq(areas.id, id));
+}
+
+// ============ ESTADOS ============
+
+export async function getEstados(): Promise<Estado[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(estados).orderBy(estados.nome_estado);
+}
+
+export async function getEstadoById(id: number): Promise<Estado | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(estados).where(eq(estados.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createEstado(nome_estado: string, uf: string): Promise<Estado> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(estados).values({ nome_estado, uf });
+  const id = result[0].insertId as number;
+  return getEstadoById(id) as Promise<Estado>;
+}
+
+export async function updateEstado(id: number, nome_estado: string, uf: string): Promise<Estado> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(estados).set({ nome_estado, uf }).where(eq(estados.id, id));
+  return getEstadoById(id) as Promise<Estado>;
+}
+
+export async function deleteEstado(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(estados).where(eq(estados.id, id));
+}
+
+// ============ CIDADES ============
+
+export async function getCidades(estado_id?: number): Promise<Cidade[]> {
+  const db = await getDb();
+  if (!db) return [];
+  if (estado_id) {
+    return db.select().from(cidades).where(eq(cidades.estado_id, estado_id)).orderBy(cidades.nome_cidade);
+  }
+  return db.select().from(cidades).orderBy(cidades.nome_cidade);
+}
+
+export async function getCidadeById(id: number): Promise<Cidade | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(cidades).where(eq(cidades.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createCidade(estado_id: number, nome_cidade: string): Promise<Cidade> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(cidades).values({ estado_id, nome_cidade });
+  const id = result[0].insertId as number;
+  return getCidadeById(id) as Promise<Cidade>;
+}
+
+export async function updateCidade(id: number, estado_id: number, nome_cidade: string): Promise<Cidade> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(cidades).set({ estado_id, nome_cidade }).where(eq(cidades.id, id));
+  return getCidadeById(id) as Promise<Cidade>;
+}
+
+export async function deleteCidade(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(cidades).where(eq(cidades.id, id));
+}
+
+// ============ MUNICIPIOS ============
+
+export async function getMunicipios(cidade_id?: number): Promise<Municipio[]> {
+  const db = await getDb();
+  if (!db) return [];
+  if (cidade_id) {
+    return db.select().from(municipios).where(eq(municipios.cidade_id, cidade_id)).orderBy(municipios.nome_municipio);
+  }
+  return db.select().from(municipios).orderBy(municipios.nome_municipio);
+}
+
+export async function getMunicipioById(id: number): Promise<Municipio | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(municipios).where(eq(municipios.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createMunicipio(cidade_id: number, nome_municipio: string): Promise<Municipio> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(municipios).values({ cidade_id, nome_municipio });
+  const id = result[0].insertId as number;
+  return getMunicipioById(id) as Promise<Municipio>;
+}
+
+export async function updateMunicipio(id: number, cidade_id: number, nome_municipio: string): Promise<Municipio> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(municipios).set({ cidade_id, nome_municipio }).where(eq(municipios.id, id));
+  return getMunicipioById(id) as Promise<Municipio>;
+}
+
+export async function deleteMunicipio(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(municipios).where(eq(municipios.id, id));
+}
+
+// ============ TECNICOS ============
+
+export async function getTecnicoByUsuarioId(usuario_id: number): Promise<Tecnico | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(tecnicos).where(eq(tecnicos.usuario_id, usuario_id)).limit(1);
+  return result[0];
+}
+
+export async function getTecnicoById(id: number): Promise<Tecnico | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(tecnicos).where(eq(tecnicos.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getTecnicosDisponiveis(filters?: {
+  area_id?: number;
+  estado_id?: number;
+  cidade_id?: number;
+  municipio_id?: number;
+}): Promise<Tecnico[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [eq(tecnicos.disponivel, true)];
+
+  if (filters?.area_id) {
+    conditions.push(eq(tecnicos.area_id, filters.area_id));
+  }
+  if (filters?.estado_id) {
+    conditions.push(eq(tecnicos.estado_id, filters.estado_id));
+  }
+  if (filters?.cidade_id) {
+    conditions.push(eq(tecnicos.cidade_id, filters.cidade_id));
+  }
+
+  const result = await db.select().from(tecnicos).where(and(...conditions)).orderBy(desc(tecnicos.createdAt));
+
+  // Se há filtro de município, fazer segunda filtragem
+  if (filters?.municipio_id) {
+    const tecnicosComMunicipio = await db
+      .select({ tecnico_id: tecnico_municipios.tecnico_id })
+      .from(tecnico_municipios)
+      .where(eq(tecnico_municipios.municipio_id, filters.municipio_id));
+
+    const ids = tecnicosComMunicipio.map(t => t.tecnico_id);
+    return result.filter(t => ids.includes(t.id));
+  }
+
+  return result;
+}
+
+export async function createTecnico(
+  usuario_id: number,
+  area_id: number,
+  estado_id: number,
+  cidade_id: number,
+  whatsapp: string,
+  email: string,
+  municipios_ids?: number[]
+): Promise<Tecnico> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(tecnicos).values({
+    usuario_id,
+    area_id,
+    estado_id,
+    cidade_id,
+    whatsapp,
+    email,
+    disponivel: true,
+  });
+
+  const tecnico_id = result[0].insertId as number;
+
+  // Adicionar municípios se fornecidos
+  if (municipios_ids && municipios_ids.length > 0) {
+    await db.insert(tecnico_municipios).values(
+      municipios_ids.map(municipio_id => ({ tecnico_id, municipio_id }))
+    );
+  }
+
+  return getTecnicoById(tecnico_id) as Promise<Tecnico>;
+}
+
+export async function updateTecnico(
+  id: number,
+  updates: {
+    area_id?: number;
+    estado_id?: number;
+    cidade_id?: number;
+    whatsapp?: string;
+    email?: string;
+    disponivel?: boolean;
+    municipios_ids?: number[];
+  }
+): Promise<Tecnico> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: Record<string, unknown> = {};
+  if (updates.area_id !== undefined) updateData.area_id = updates.area_id;
+  if (updates.estado_id !== undefined) updateData.estado_id = updates.estado_id;
+  if (updates.cidade_id !== undefined) updateData.cidade_id = updates.cidade_id;
+  if (updates.whatsapp !== undefined) updateData.whatsapp = updates.whatsapp;
+  if (updates.email !== undefined) updateData.email = updates.email;
+  if (updates.disponivel !== undefined) updateData.disponivel = updates.disponivel;
+
+  if (Object.keys(updateData).length > 0) {
+    await db.update(tecnicos).set(updateData).where(eq(tecnicos.id, id));
+  }
+
+  // Atualizar municípios se fornecidos
+  if (updates.municipios_ids !== undefined) {
+    // Deletar municípios antigos
+    await db.delete(tecnico_municipios).where(eq(tecnico_municipios.tecnico_id, id));
+    // Inserir novos
+    if (updates.municipios_ids.length > 0) {
+      await db.insert(tecnico_municipios).values(
+        updates.municipios_ids.map(municipio_id => ({ tecnico_id: id, municipio_id }))
+      );
+    }
+  }
+
+  return getTecnicoById(id) as Promise<Tecnico>;
+}
+
+export async function deleteTecnico(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Deletar municípios primeiro
+  await db.delete(tecnico_municipios).where(eq(tecnico_municipios.tecnico_id, id));
+  // Depois deletar técnico
+  await db.delete(tecnicos).where(eq(tecnicos.id, id));
+}
+
+export async function getTecnicoMunicipios(tecnico_id: number): Promise<Municipio[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({ municipio_id: tecnico_municipios.municipio_id })
+    .from(tecnico_municipios)
+    .where(eq(tecnico_municipios.tecnico_id, tecnico_id));
+
+  const municipios_ids = result.map(r => r.municipio_id);
+  if (municipios_ids.length === 0) return [];
+
+  return db.select().from(municipios).where(
+    inArray(municipios.id, municipios_ids)
+  );
+}
