@@ -15,7 +15,10 @@ export default function EstadosManagement() {
   const [uf, setUf] = useState("");
 
   const utils = trpc.useUtils();
-  const { data: estados = [] } = trpc.estados.list.useQuery();
+  const { data: estados = [] } = trpc.estados.list.useQuery(undefined, {
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
   const createMutation = trpc.estados.create.useMutation({
     onSuccess: () => utils.estados.list.invalidate(),
   });

@@ -14,7 +14,10 @@ export default function AreasManagement() {
   const [nome, setNome] = useState("");
 
   const utils = trpc.useUtils();
-  const { data: areas = [] } = trpc.areas.list.useQuery();
+  const { data: areas = [] } = trpc.areas.list.useQuery(undefined, {
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    gcTime: 1000 * 60 * 10, // 10 minutos
+  });
   const createMutation = trpc.areas.create.useMutation({
     onSuccess: () => utils.areas.list.invalidate(),
   });

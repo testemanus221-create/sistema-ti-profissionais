@@ -109,3 +109,4 @@
 - [x] Corrigir painel admin que não está abrindo
 - [x] Corrigir rota /admin retornando 404
 - [x] Corrigir tremor/flickering na tela do painel admin
+- [x] Corrigir queries infinitas na aba de áreas de atuação

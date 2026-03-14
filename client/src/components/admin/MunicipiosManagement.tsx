@@ -17,7 +17,10 @@ export default function MunicipiosManagement() {
 
   const utils = trpc.useUtils();
   const { data: cidades = [] } = trpc.cidades.list.useQuery();
-  const { data: municipios = [] } = trpc.municipios.list.useQuery();
+  const { data: municipios = [] } = trpc.municipios.list.useQuery(undefined, {
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
   const createMutation = trpc.municipios.create.useMutation({
     onSuccess: () => utils.municipios.list.invalidate(),
   });
