@@ -111,7 +111,8 @@ export async function getUserByEmail(email: string) {
     return undefined;
   }
 
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const normalizedEmail = email.toLowerCase().trim();
+  const result = await db.select().from(users).where(eq(users.email, normalizedEmail)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
 }
@@ -351,10 +352,11 @@ export async function createTecnicoPublic(
   const passwordHash = crypto.createHash('sha256').update(senha).digest('hex');
   
   // Criar usuário com dados do técnico
+  const normalizedEmail = email.toLowerCase().trim();
   const userResult = await db.insert(users).values({
     openId: `tecnico-${Date.now()}-${Math.random().toString(36).substring(7)}`,
     name: nome,
-    email: email,
+    email: normalizedEmail,
     passwordHash: passwordHash,
     loginMethod: 'email',
     role: 'user',
