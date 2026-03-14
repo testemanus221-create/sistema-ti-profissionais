@@ -111,3 +111,6 @@
 - [x] Corrigir tremor/flickering na tela do painel admin
 - [x] Corrigir queries infinitas na aba de áreas de atuação
 - [x] Corrigir travamento completo do painel admin (ciclo infinito de auth.me)
+- [x] Popular banco com áreas de atuação reais de TI
+- [x] Popular banco com estados brasileiros reais
+- [x] Popular banco com cidades e municípios reais
