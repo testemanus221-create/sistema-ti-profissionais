@@ -106,3 +106,4 @@
 - [x] Implementar verificação de permissão para acesso ao painel admin
 - [x] Impedir técnicos de ver outros técnicos
 - [x] Impedir técnicos de usar busca de profissionais
+- [x] Corrigir painel admin que não está abrindo

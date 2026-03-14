@@ -27,10 +27,10 @@ export default function ProfissionaisManagement() {
   );
 
   const { data: tecnicos = [], isLoading, refetch } = trpc.tecnicos.listDisponibles.useQuery({
-    area_id: filters.area_id ? parseInt(filters.area_id) : undefined,
-    estado_id: filters.estado_id ? parseInt(filters.estado_id) : undefined,
-    cidade_id: filters.cidade_id ? parseInt(filters.cidade_id) : undefined,
-    municipio_id: filters.municipio_id ? parseInt(filters.municipio_id) : undefined,
+    area_id: filters.area_id && filters.area_id !== "0" ? parseInt(filters.area_id) : undefined,
+    estado_id: filters.estado_id && filters.estado_id !== "0" ? parseInt(filters.estado_id) : undefined,
+    cidade_id: filters.cidade_id && filters.cidade_id !== "0" ? parseInt(filters.cidade_id) : undefined,
+    municipio_id: filters.municipio_id && filters.municipio_id !== "0" ? parseInt(filters.municipio_id) : undefined,
   });
 
   const deleteMutation = trpc.tecnicos.delete.useMutation();
@@ -72,7 +72,7 @@ export default function ProfissionaisManagement() {
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas</SelectItem>
+                  <SelectItem value="0">Todas</SelectItem>
                   {areas?.map(area => (
                     <SelectItem key={area.id} value={area.id.toString()}>
                       {area.nome_area}
@@ -86,13 +86,13 @@ export default function ProfissionaisManagement() {
               <Label>Estado</Label>
               <Select 
                 value={filters.estado_id} 
-                onValueChange={(value) => setFilters({ ...filters, estado_id: value, cidade_id: "", municipio_id: "" })}
+                onValueChange={(value) => setFilters({ ...filters, estado_id: value, cidade_id: "0", municipio_id: "0" })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="0">Todos</SelectItem>
                   {estados?.map(estado => (
                     <SelectItem key={estado.id} value={estado.id.toString()}>
                       {estado.uf}
@@ -106,14 +106,14 @@ export default function ProfissionaisManagement() {
               <Label>Cidade</Label>
               <Select 
                 value={filters.cidade_id} 
-                onValueChange={(value) => setFilters({ ...filters, cidade_id: value, municipio_id: "" })}
+                onValueChange={(value) => setFilters({ ...filters, cidade_id: value, municipio_id: "0" })}
                 disabled={!filters.estado_id}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas</SelectItem>
+                  <SelectItem value="0">Todas</SelectItem>
                   {cidades?.map(cidade => (
                     <SelectItem key={cidade.id} value={cidade.id.toString()}>
                       {cidade.nome_cidade}
@@ -134,7 +134,7 @@ export default function ProfissionaisManagement() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="0">Todos</SelectItem>
                   {municipios?.map(municipio => (
                     <SelectItem key={municipio.id} value={municipio.id.toString()}>
                       {municipio.nome_municipio}
