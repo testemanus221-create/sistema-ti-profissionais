@@ -293,17 +293,26 @@ export const appRouter = router({
         municipios_ids: z.array(z.number()).optional(),
       }))
       .mutation(async ({ input }) => {
-        // Permitir cadastro público de técnico sem autenticação
-        return await db.createTecnicoPublic(
-          input.nome,
-          input.email,
-          input.senha,
-          input.area_id,
-          input.estado_id,
-          input.cidade_id,
-          input.whatsapp,
-          input.municipios_ids,
-        );
+        try {
+          return await db.createTecnicoPublic(
+            input.nome,
+            input.email,
+            input.senha,
+            input.area_id,
+            input.estado_id,
+            input.cidade_id,
+            input.whatsapp,
+            input.municipios_ids,
+          );
+        } catch (error: any) {
+          if (error.message?.includes('UNIQUE') || error.message?.includes('Duplicate')) {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'Este email já está cadastrado. Faça login para continuar.',
+            });
+          }
+          throw error;
+        }
       }),
 
     // Atualizar dados do técnico (apenas próprios dados)

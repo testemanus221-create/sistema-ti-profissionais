@@ -122,3 +122,5 @@
 - [x] Criar função de login por email/senha
 - [x] Corrigir erro de controlled/uncontrolled input no Register.tsx
 - [x] Corrigir redirecionamento após cadastro de técnico (404 no /dashboard)
+- [x] Corrigir erro de INSERT ao cadastrar técnico (campo name incompleto)
+- [x] Corrigir erro de login "Email ou senha incorretos"
