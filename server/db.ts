@@ -321,6 +321,50 @@ export async function getTecnicosDisponiveis(filters?: {
   return result;
 }
 
+export async function createTecnicoPublic(
+  nome: string,
+  email: string,
+  area_id: number,
+  estado_id: number,
+  cidade_id: number,
+  whatsapp: string,
+  municipios_ids?: number[]
+): Promise<Tecnico> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Criar usuário com dados do técnico
+  const userResult = await db.insert(users).values({
+    openId: `tecnico-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+    name: nome,
+    email: email,
+    loginMethod: 'email',
+    role: 'user',
+  });
+  const userId = userResult[0].insertId as number;
+  
+  // Criar técnico
+  const result = await db.insert(tecnicos).values({
+    usuario_id: userId,
+    area_id,
+    estado_id,
+    cidade_id,
+    whatsapp,
+    email,
+    disponivel: true,
+  });
+  const tecnico_id = result[0].insertId as number;
+  
+  // Adicionar municípios se fornecidos
+  if (municipios_ids && municipios_ids.length > 0) {
+    await db.insert(tecnico_municipios).values(
+      municipios_ids.map(municipio_id => ({ tecnico_id, municipio_id }))
+    );
+  }
+  
+  return getTecnicoById(tecnico_id) as Promise<Tecnico>;
+}
+
 export async function createTecnico(
   usuario_id: number,
   area_id: number,

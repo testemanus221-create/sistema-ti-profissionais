@@ -115,3 +115,4 @@
 - [x] Popular banco com estados brasileiros reais
 - [x] Popular banco com cidades e municípios reais
 - [x] Corrigir erro ao deletar estado com cidades relacionadas
+- [x] Corrigir página de cadastro de técnico exigindo autenticação

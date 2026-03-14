@@ -257,30 +257,15 @@ export const appRouter = router({
         whatsapp: z.string().min(10, "WhatsApp inválido"),
         municipios_ids: z.array(z.number()).optional(),
       }))
-      .mutation(async ({ input, ctx }) => {
-        // Verificar se usuário já existe
-        if (!ctx.user) {
-          throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: 'Você precisa estar autenticado',
-          });
-        }
-
-        const existingTecnico = await db.getTecnicoByUsuarioId(ctx.user.id);
-        if (existingTecnico) {
-          throw new TRPCError({
-            code: 'CONFLICT',
-            message: 'Você já possui um cadastro como técnico',
-          });
-        }
-
-        return await db.createTecnico(
-          ctx.user.id,
+      .mutation(async ({ input }) => {
+        // Permitir cadastro público de técnico sem autenticação
+        return await db.createTecnicoPublic(
+          input.nome,
+          input.email,
           input.area_id,
           input.estado_id,
           input.cidade_id,
           input.whatsapp,
-          input.email,
           input.municipios_ids,
         );
       }),
