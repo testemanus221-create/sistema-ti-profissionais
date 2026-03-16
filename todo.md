@@ -131,3 +131,14 @@
 - [x] Corrigir redirecionamento após login bem-sucedido do técnico (404)
 - [x] Corrigir JWT do loginEmail para incluir appId e name (erro de autenticação)
 - [x] Adicionar testes para o fluxo de login com email/senha
+
+
+## Nova Requisição - Dashboard do Técnico Completo
+- [x] Criar página de dashboard do técnico com layout profissional
+- [x] Exibir informações básicas do técnico (nome, email, área, localização, WhatsApp)
+- [x] Implementar edição de informações pessoais (apenas próprios dados)
+- [x] Implementar toggle de disponibilidade (on/off)
+- [x] Sincronizar disponibilidade com a lista de profissionais do painel admin
+- [x] Quando disponível (on), técnico aparece na lista do admin
+- [x] Quando indisponível (off), técnico desaparece da lista do admin
+- [x] Testar fluxo completo: editar dados, toggle disponibilidade, verificar lista admin
