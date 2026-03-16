@@ -128,3 +128,4 @@
 - [x] Corrigir erro de cadastro com email duplicado (constraint UNIQUE não está sendo capturada)
 - [x] Limpar dados de teste do banco de dados
 - [x] Debugar erro de login "Email ou senha incorretos" - verificar fluxo cadastro/login
+- [x] Corrigir redirecionamento após login bem-sucedido do técnico (404)

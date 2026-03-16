@@ -95,12 +95,25 @@ export default function TecnicoDashboard() {
     navigate("/");
   };
 
-  if (!tecnico) {
+  // Se técnico não foi encontrado (null), redirecionar para completar cadastro
+  useEffect(() => {
+    if (tecnico === null) {
+      navigate("/register");
+    }
+  }, [tecnico, navigate]);
+
+  // Enquanto está carregando, mostrar spinner
+  if (tecnico === undefined) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="animate-spin text-blue-600" size={40} />
       </div>
     );
+  }
+
+  // Se tecnico é null após o useEffect, não renderizar nada (redirecionamento em progresso)
+  if (!tecnico) {
+    return null;
   }
 
   return (
