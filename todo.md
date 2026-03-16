@@ -129,3 +129,5 @@
 - [x] Limpar dados de teste do banco de dados
 - [x] Debugar erro de login "Email ou senha incorretos" - verificar fluxo cadastro/login
 - [x] Corrigir redirecionamento após login bem-sucedido do técnico (404)
+- [x] Corrigir JWT do loginEmail para incluir appId e name (erro de autenticação)
+- [x] Adicionar testes para o fluxo de login com email/senha

@@ -5,6 +5,7 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
+import { sdk } from "./_core/sdk";
 
 // Middleware para verificar se é admin
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -48,13 +49,9 @@ export const appRouter = router({
           });
         }
 
+            // Usar sdk.createSessionToken para criar um JWT válido
+        const token = await sdk.createSessionToken(user.openId, { name: user.name || '' });
         const cookieOptions = getSessionCookieOptions(ctx.req);
-        const sessionData = { userId: user.id, openId: user.openId };
-        const jose = await import('jose');
-        const token = await new jose.SignJWT(sessionData)
-          .setProtectedHeader({ alg: 'HS256' })
-          .setExpirationTime('7d')
-          .sign(new TextEncoder().encode(process.env.JWT_SECRET || 'secret'));
         ctx.res.setHeader('Set-Cookie', `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=604800`);
         
         return { success: true, user };
