@@ -52,7 +52,8 @@ export const appRouter = router({
             // Usar sdk.createSessionToken para criar um JWT válido
         const token = await sdk.createSessionToken(user.openId, { name: user.name || '' });
         const cookieOptions = getSessionCookieOptions(ctx.req);
-        const { serialize } = require('cookie') as any;
+        const cookieModule = await import('cookie');
+        const serialize = (cookieModule as any).serialize;
         const cookieHeader = serialize(COOKIE_NAME, token, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
         ctx.res.setHeader('Set-Cookie', cookieHeader);
         
