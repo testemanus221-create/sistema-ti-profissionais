@@ -142,3 +142,4 @@
 - [x] Quando disponível (on), técnico aparece na lista do admin
 - [x] Quando indisponível (off), técnico desaparece da lista do admin
 - [x] Testar fluxo completo: editar dados, toggle disponibilidade, verificar lista admin
+- [x] Corrigir cookie do loginEmail para usar serialize() com opcoes corretas
