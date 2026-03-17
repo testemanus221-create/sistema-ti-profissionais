@@ -153,6 +153,6 @@
 - [x] Criar página "Esqueci minha senha"
 - [x] Criar página de confirmação de código
 - [x] Criar página de reset de senha
-- [ ] Integrar envio de email com código de confirmação
+- [x] Integrar envio de email com código de confirmação
 - [x] Adicionar botão "Esqueci minha senha" na página de login
 - [ ] Testar fluxo completo de recuperação de senha

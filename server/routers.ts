@@ -72,7 +72,13 @@ export const appRouter = router({
 
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         const resetToken = await db.createPasswordResetToken(user.id, code);
-        console.log(`[Password Reset] Email: ${input.email}, Code: ${code}`);
+        
+        const { sendPasswordResetEmail } = await import('./_core/email');
+        const emailSent = await sendPasswordResetEmail(input.email, code);
+        
+        if (!emailSent) {
+          console.warn(`[Password Reset] Failed to send email to ${input.email}`);
+        }
 
         return { success: true, message: 'Codigo enviado para o email' };
       }),
