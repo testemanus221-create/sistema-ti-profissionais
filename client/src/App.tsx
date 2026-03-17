@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import { ForgotPassword } from "./pages/ForgotPassword";
 import AdminDashboard from "./pages/AdminDashboard";
 import TecnicoDashboard from "./pages/TecnicoDashboard";
 import Profissionais from "./pages/Profissionais";
@@ -55,6 +56,7 @@ function Router() {
         <Route path={"/"} component={Home} />
         <Route path={"/login"} component={Login} />
         <Route path={"/register"} component={Register} />
+        <Route path={"/forgot-password"} component={ForgotPassword} />
         <Route path={"/admin"} component={AdminRoute} />
         <Route path={"/admin/*"} component={AdminRoute} />
         <Route path={"/profissionais"} component={ProfissionaisRoute} />

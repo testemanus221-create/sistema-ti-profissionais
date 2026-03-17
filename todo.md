@@ -143,3 +143,16 @@
 - [x] Quando indisponível (off), técnico desaparece da lista do admin
 - [x] Testar fluxo completo: editar dados, toggle disponibilidade, verificar lista admin
 - [x] Corrigir cookie do loginEmail para usar serialize() com opcoes corretas
+
+
+## Nova Requisição - Sistema de Recuperação de Senha
+- [x] Criar tabela de reset tokens no banco de dados
+- [x] Implementar rota de requisição de reset (enviar código por email)
+- [x] Implementar rota de validação de código
+- [x] Implementar rota de reset de senha
+- [x] Criar página "Esqueci minha senha"
+- [x] Criar página de confirmação de código
+- [x] Criar página de reset de senha
+- [ ] Integrar envio de email com código de confirmação
+- [x] Adicionar botão "Esqueci minha senha" na página de login
+- [ ] Testar fluxo completo de recuperação de senha

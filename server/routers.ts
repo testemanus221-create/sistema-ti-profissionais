@@ -59,6 +59,71 @@ export const appRouter = router({
         
         return { success: true, user };
       }),
+
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await db.getUserByEmail(input.email);
+        if (!user) {
+          return { success: true, message: 'Se o email existir, um codigo sera enviado' };
+        }
+
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const resetToken = await db.createPasswordResetToken(user.id, code);
+        console.log(`[Password Reset] Email: ${input.email}, Code: ${code}`);
+
+        return { success: true, message: 'Codigo enviado para o email' };
+      }),
+
+    validateResetCode: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        code: z.string().length(6),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await db.getUserByEmail(input.email);
+        if (!user) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Email nao encontrado',
+          });
+        }
+
+        const resetToken = await db.validateResetCode(user.id, input.code);
+        if (!resetToken) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'Codigo invalido ou expirado',
+          });
+        }
+
+        return { success: true, token: resetToken.token };
+      }),
+
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        novaSenha: z.string().min(6),
+      }))
+      .mutation(async ({ input }) => {
+        const resetToken = await db.getPasswordResetToken(input.token);
+        if (!resetToken) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'Token invalido ou expirado',
+          });
+        }
+
+        const crypto = await import('crypto');
+        const senhaHash = crypto.createHash('sha256').update(input.novaSenha).digest('hex');
+
+        await db.updateUserPassword(resetToken.usuario_id, senhaHash);
+        await db.markResetTokenAsUsed(resetToken.id);
+
+        return { success: true, message: 'Senha alterada com sucesso' };
+      }),
   }),
 
   // ============ AREAS ============

@@ -1,0 +1,9 @@
+{
+  "query": "-- Deletar municípios que contêm números\nDELETE FROM municipios WHERE nome_municipio REGEXP '[0-9]';\n\n-- Deletar cidades que contêm números\nDELETE FROM cidades WHERE nome_cidade REGEXP '[0-9]';\n\n-- Deletar estados que contêm números\nDELETE FROM estados WHERE nome_estado REGEXP '[0-9]' OR uf REGEXP '[0-9]';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user qp5xGh74A2pnCCm.root --database hfWdEoR2VQDjiKHRQ6AEZz --execute -- Deletar municípios que contêm números\nDELETE FROM municipios WHERE nome_municipio REGEXP '[0-9]';\n\n-- Deletar cidades que contêm números\nDELETE FROM cidades WHERE nome_cidade REGEXP '[0-9]';\n\n-- Deletar estados que contêm números\nDELETE FROM estados WHERE nome_estado REGEXP '[0-9]' OR uf REGEXP '[0-9]';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 277
+}

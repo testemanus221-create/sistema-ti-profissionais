@@ -131,6 +131,14 @@ export default function Login() {
                 </Button>
                 <Button 
                   type="button"
+                  variant="link" 
+                  className="w-full text-sm"
+                  onClick={() => navigate('/forgot-password')}
+                >
+                  Esqueci minha senha
+                </Button>
+                <Button 
+                  type="button"
                   variant="outline" 
                   className="w-full"
                   onClick={() => setLoginMethod('oauth')}

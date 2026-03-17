@@ -153,3 +153,25 @@ export const tecnico_municipios = mysqlTable("tecnico_municipios", {
 
 export type TecnicoMunicipio = typeof tecnico_municipios.$inferSelect;
 export type InsertTecnicoMunicipio = typeof tecnico_municipios.$inferInsert;
+
+/**
+ * Password Reset Tokens
+ * Armazena tokens para reset de senha com expiração
+ */
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  usuario_id: int("usuario_id").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  code: varchar("code", { length: 6 }).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  usuarioFk: foreignKey({
+    columns: [table.usuario_id],
+    foreignColumns: [users.id],
+  }),
+}));
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;

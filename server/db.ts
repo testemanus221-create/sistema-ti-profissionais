@@ -1,4 +1,4 @@
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -9,12 +9,14 @@ import {
   municipios,
   tecnicos,
   tecnico_municipios,
+  passwordResetTokens,
   type Area,
   type Estado,
   type Cidade,
   type Municipio,
   type Tecnico,
   type TecnicoMunicipio,
+  type PasswordResetToken,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -485,4 +487,115 @@ export async function getTecnicoMunicipios(tecnico_id: number): Promise<Municipi
   return db.select().from(municipios).where(
     inArray(municipios.id, municipios_ids)
   );
+}
+
+
+// ============ PASSWORD RESET ============
+
+export async function createPasswordResetToken(
+  usuario_id: number,
+  code: string
+): Promise<PasswordResetToken> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Gerar token único
+  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  
+  // Expiração em 1 hora
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+  const result = await db.insert(passwordResetTokens).values({
+    usuario_id,
+    token,
+    code,
+    expiresAt,
+  });
+
+  const resetToken = await db
+    .select()
+    .from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, token))
+    .limit(1);
+
+  return resetToken[0];
+}
+
+export async function getPasswordResetToken(
+  token: string
+): Promise<PasswordResetToken | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(passwordResetTokens)
+    .where(and(
+      eq(passwordResetTokens.token, token),
+      isNull(passwordResetTokens.usedAt)
+    ))
+    .limit(1);
+
+  if (result.length === 0) return null;
+
+  const resetToken = result[0];
+
+  // Verificar se o token expirou
+  if (new Date() > resetToken.expiresAt) {
+    return null;
+  }
+
+  return resetToken;
+}
+
+export async function validateResetCode(
+  usuario_id: number,
+  code: string
+): Promise<PasswordResetToken | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(passwordResetTokens)
+    .where(and(
+      eq(passwordResetTokens.usuario_id, usuario_id),
+      eq(passwordResetTokens.code, code),
+      isNull(passwordResetTokens.usedAt)
+    ))
+    .limit(1);
+
+  if (result.length === 0) return null;
+
+  const resetToken = result[0];
+
+  // Verificar se o token expirou
+  if (new Date() > resetToken.expiresAt) {
+    return null;
+  }
+
+  return resetToken;
+}
+
+export async function markResetTokenAsUsed(token_id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(passwordResetTokens)
+    .set({ usedAt: new Date() })
+    .where(eq(passwordResetTokens.id, token_id));
+}
+
+export async function updateUserPassword(
+  usuario_id: number,
+  passwordHash: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({ passwordHash })
+    .where(eq(users.id, usuario_id));
 }
