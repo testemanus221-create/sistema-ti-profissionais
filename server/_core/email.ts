@@ -17,10 +17,24 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   }
 
   try {
-    const endpoint = new URL(
-      "webdevtoken.v1.WebDevService/SendEmail",
-      ENV.forgeApiUrl.endsWith("/") ? ENV.forgeApiUrl : `${ENV.forgeApiUrl}/`
-    ).toString();
+    // Construir endpoint com barra inicial no path
+    const baseUrl = ENV.forgeApiUrl.endsWith("/") ? ENV.forgeApiUrl : `${ENV.forgeApiUrl}/`;
+    const endpoint = new URL("/webdevtoken.v1.WebDevService/SendEmail", baseUrl).toString();
+
+    // Preparar payload - omitir 'from' se não estiver configurado ou vazio
+    const body: any = {
+      to: payload.to,
+      subject: payload.subject,
+      html: payload.html,
+    };
+
+    // Apenas incluir 'from' se estiver definido e não vazio
+    if (payload.from && payload.from.trim()) {
+      body.from = payload.from.trim();
+    }
+
+    console.log(`[Email] Sending email to ${payload.to} from ${body.from || "(default)"}`);
+    console.log(`[Email] Endpoint: ${endpoint}`);
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -30,28 +44,24 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
         "content-type": "application/json",
         "connect-protocol-version": "1",
       },
-      body: JSON.stringify({
-        to: payload.to,
-        from: payload.from,
-        subject: payload.subject,
-        html: payload.html,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
-      console.warn(
+      console.error(
         `[Email] Failed to send email (${response.status} ${response.statusText})${
           detail ? `: ${detail}` : ""
         }`
       );
+      console.error(`[Email] Request body:`, JSON.stringify(body));
       return false;
     }
 
     console.log(`[Email] Email sent successfully to ${payload.to}`);
     return true;
   } catch (error) {
-    console.warn("[Email] Error sending email:", error);
+    console.error("[Email] Error sending email:", error);
     return false;
   }
 }

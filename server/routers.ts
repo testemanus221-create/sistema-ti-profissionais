@@ -80,10 +80,14 @@ export const appRouter = router({
         const emailSent = await sendPasswordResetEmail(input.email, code, emailSender || undefined);
         
         if (!emailSent) {
-          console.warn(`[Password Reset] Failed to send email to ${input.email}`);
+          console.error(`[Password Reset] Failed to send email to ${input.email}`);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Falha ao enviar email. Tente novamente mais tarde.',
+          });
         }
 
-        return { success: true, message: 'Codigo enviado para o email' };
+        return { success: true, message: 'Codigo enviado para o email com sucesso!' };
       }),
 
     validateResetCode: publicProcedure

@@ -1,0 +1,9 @@
+{
+  "query": "\n-- Desabilitar verificação de chaves estrangeiras temporariamente\nSET FOREIGN_KEY_CHECKS = 0;\n\n-- Deletar todos os dados de todas as tabelas\nTRUNCATE TABLE tecnico_municipios;\nTRUNCATE TABLE password_reset_tokens;\nTRUNCATE TABLE tecnicos;\nTRUNCATE TABLE users;\nTRUNCATE TABLE municipios;\nTRUNCATE TABLE cidades;\nTRUNCATE TABLE estados;\nTRUNCATE TABLE areas;\nTRUNCATE TABLE system_config;\n\n-- Reabilitar verificação de chaves estrangeiras\nSET FOREIGN_KEY_CHECKS = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user qp5xGh74A2pnCCm.root --database hfWdEoR2VQDjiKHRQ6AEZz --execute \n-- Desabilitar verificação de chaves estrangeiras temporariamente\nSET FOREIGN_KEY_CHECKS = 0;\n\n-- Deletar todos os dados de todas as tabelas\nTRUNCATE TABLE tecnico_municipios;\nTRUNCATE TABLE password_reset_tokens;\nTRUNCATE TABLE tecnicos;\nTRUNCATE TABLE users;\nTRUNCATE TABLE municipios;\nTRUNCATE TABLE cidades;\nTRUNCATE TABLE estados;\nTRUNCATE TABLE areas;\nTRUNCATE TABLE system_config;\n\n-- Reabilitar verificação de chaves estrangeiras\nSET FOREIGN_KEY_CHECKS = 1;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1020
+}

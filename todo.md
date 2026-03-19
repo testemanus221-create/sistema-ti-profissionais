@@ -165,3 +165,12 @@
 - [x] Criar UI no painel admin para configurar email
 - [x] Atualizar função de envio de email para usar email configurado
 - [x] Testar envio de email com email configurado
+
+
+## Bug - Envio de Email de Recuperação de Senha
+- [x] Investigar por que o email não está sendo enviado
+- [x] Corrigir endpoint URL com barra inicial no path
+- [x] Melhorar logging de erros para debug
+- [x] Adicionar validação de email_sender configurado
+- [x] Retornar erro ao usuário se email falhar
+- [x] Testar fluxo completo: configurar email → solicitar reset → verificar se código chega
