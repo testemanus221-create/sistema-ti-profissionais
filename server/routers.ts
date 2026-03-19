@@ -73,8 +73,11 @@ export const appRouter = router({
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         const resetToken = await db.createPasswordResetToken(user.id, code);
         
+        // Obter email de origem configurado
+        const emailSender = await db.getSystemConfig('email_sender');
+        
         const { sendPasswordResetEmail } = await import('./_core/email');
-        const emailSent = await sendPasswordResetEmail(input.email, code);
+        const emailSent = await sendPasswordResetEmail(input.email, code, emailSender || undefined);
         
         if (!emailSent) {
           console.warn(`[Password Reset] Failed to send email to ${input.email}`);
@@ -432,7 +435,31 @@ export const appRouter = router({
         await db.deleteTecnico(input.id);
         return { success: true };
       }),
+   }),
+
+  // ============ ADMIN CONFIG ============
+  config: router({
+    // Obter configuração de email (admin only)
+    getEmailSender: adminProcedure.query(async () => {
+      const email = await db.getSystemConfig('email_sender');
+      return { email: email || '' };
+    }),
+
+    // Atualizar configuração de email (admin only)
+    setEmailSender: adminProcedure
+      .input(z.object({
+        email: z.string().email('Email inválido'),
+      }))
+      .mutation(async ({ input }) => {
+        const result = await db.setSystemConfig('email_sender', input.email);
+        if (!result) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Erro ao salvar configuração',
+          });
+        }
+        return { success: true, email: result.value };
+      }),
   }),
 });
-
 export type AppRouter = typeof appRouter;

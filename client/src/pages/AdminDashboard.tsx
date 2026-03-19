@@ -9,6 +9,7 @@ import EstadosManagement from "@/components/admin/EstadosManagement";
 import CidadesManagement from "@/components/admin/CidadesManagement";
 import MunicipiosManagement from "@/components/admin/MunicipiosManagement";
 import ProfissionaisManagement from "@/components/admin/ProfissionaisManagement";
+import SystemConfig from "@/components/admin/SystemConfig";
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
@@ -31,6 +32,7 @@ export default function AdminDashboard() {
     { id: "cidades", label: "Cidades" },
     { id: "municipios", label: "Municípios" },
     { id: "profissionais", label: "Profissionais" },
+    { id: "config", label: "Configurações" },
   ];
 
   return (
@@ -89,6 +91,7 @@ export default function AdminDashboard() {
           {activeTab === "cidades" && <CidadesManagement />}
           {activeTab === "municipios" && <MunicipiosManagement />}
           {activeTab === "profissionais" && <ProfissionaisManagement />}
+          {activeTab === "config" && <SystemConfig />}
         </div>
       </main>
     </div>

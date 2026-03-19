@@ -10,6 +10,7 @@ import {
   tecnicos,
   tecnico_municipios,
   passwordResetTokens,
+  systemConfig,
   type Area,
   type Estado,
   type Cidade,
@@ -17,6 +18,7 @@ import {
   type Tecnico,
   type TecnicoMunicipio,
   type PasswordResetToken,
+  type SystemConfig,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -598,4 +600,64 @@ export async function updateUserPassword(
     .update(users)
     .set({ passwordHash })
     .where(eq(users.id, usuario_id));
+}
+
+
+/**
+ * Obter valor de configuração do sistema
+ */
+export async function getSystemConfig(key: string): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db
+      .select()
+      .from(systemConfig)
+      .where(eq(systemConfig.key, key))
+      .limit(1);
+
+    return result.length > 0 ? result[0].value : null;
+  } catch (error) {
+    console.warn("[Database] Error getting system config:", error);
+    return null;
+  }
+}
+
+/**
+ * Atualizar ou criar configuração do sistema
+ */
+export async function setSystemConfig(key: string, value: string): Promise<SystemConfig | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Tentar atualizar primeiro
+    const existing = await db
+      .select()
+      .from(systemConfig)
+      .where(eq(systemConfig.key, key))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db
+        .update(systemConfig)
+        .set({ value })
+        .where(eq(systemConfig.key, key));
+    } else {
+      await db.insert(systemConfig).values({ key, value });
+    }
+
+    // Retornar o valor atualizado
+    const result = await db
+      .select()
+      .from(systemConfig)
+      .where(eq(systemConfig.key, key))
+      .limit(1);
+
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.warn("[Database] Error setting system config:", error);
+    return null;
+  }
 }

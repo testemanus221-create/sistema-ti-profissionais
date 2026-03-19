@@ -175,3 +175,19 @@ export const passwordResetTokens = mysqlTable("password_reset_tokens", {
 
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+
+
+/**
+ * System Configuration
+ * Armazena configurações globais do sistema (ex: email de origem)
+ */
+export const systemConfig = mysqlTable("system_config", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 255 }).notNull().unique(),
+  value: text("value").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SystemConfig = typeof systemConfig.$inferSelect;
+export type InsertSystemConfig = typeof systemConfig.$inferInsert;

@@ -156,3 +156,12 @@
 - [x] Integrar envio de email com código de confirmação
 - [x] Adicionar botão "Esqueci minha senha" na página de login
 - [ ] Testar fluxo completo de recuperação de senha
+
+
+## Nova Requisição - Configuração de Email de Origem no Admin
+- [x] Criar tabela de configurações do sistema
+- [x] Adicionar campo de email de origem (sender email)
+- [x] Implementar rotas backend para gerenciar configurações
+- [x] Criar UI no painel admin para configurar email
+- [x] Atualizar função de envio de email para usar email configurado
+- [x] Testar envio de email com email configurado

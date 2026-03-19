@@ -4,6 +4,7 @@ export type EmailPayload = {
   to: string;
   subject: string;
   html: string;
+  from?: string;
 };
 
 /**
@@ -31,6 +32,7 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
       },
       body: JSON.stringify({
         to: payload.to,
+        from: payload.from,
         subject: payload.subject,
         html: payload.html,
       }),
@@ -59,7 +61,8 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
  */
 export async function sendPasswordResetEmail(
   email: string,
-  code: string
+  code: string,
+  fromEmail?: string
 ): Promise<boolean> {
   const html = `
     <!DOCTYPE html>
@@ -97,6 +100,7 @@ export async function sendPasswordResetEmail(
 
   return sendEmail({
     to: email,
+    from: fromEmail,
     subject: "Código de Recuperação de Senha - TechConnect",
     html,
   });
