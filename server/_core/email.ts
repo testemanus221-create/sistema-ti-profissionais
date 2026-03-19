@@ -21,19 +21,15 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
     const baseUrl = ENV.forgeApiUrl.endsWith("/") ? ENV.forgeApiUrl : `${ENV.forgeApiUrl}/`;
     const endpoint = new URL("/webdevtoken.v1.WebDevService/SendEmail", baseUrl).toString();
 
-    // Preparar payload - omitir 'from' se não estiver configurado ou vazio
+    // Preparar payload - NUNCA incluir 'from' pois a API Forge só aceita remetentes verificados
+    // Usar o remetente padrão verificado da plataforma
     const body: any = {
       to: payload.to,
       subject: payload.subject,
       html: payload.html,
     };
 
-    // Apenas incluir 'from' se estiver definido e não vazio
-    if (payload.from && payload.from.trim()) {
-      body.from = payload.from.trim();
-    }
-
-    console.log(`[Email] Sending email to ${payload.to} from ${body.from || "(default)"}`);
+    console.log(`[Email] Sending email to ${payload.to} from (default Forge sender)`);
     console.log(`[Email] Endpoint: ${endpoint}`);
 
     const response = await fetch(endpoint, {

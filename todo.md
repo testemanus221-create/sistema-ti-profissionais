@@ -173,4 +173,5 @@
 - [x] Melhorar logging de erros para debug
 - [x] Adicionar validação de email_sender configurado
 - [x] Retornar erro ao usuário se email falhar
-- [x] Testar fluxo completo: configurar email → solicitar reset → verificar se código chega
+- [x] Remover campo 'from' do payload (usar remetente padrão verificado da API)
+- [x] Testar fluxo completo: solicitar reset → verificar se código chega
