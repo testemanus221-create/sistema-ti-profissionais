@@ -175,3 +175,11 @@
 - [x] Retornar erro ao usuário se email falhar
 - [x] Remover campo 'from' do payload (usar remetente padrão verificado da API)
 - [x] Testar fluxo completo: solicitar reset → verificar se código chega
+
+
+## Integração Resend - Email de Recuperação de Senha
+- [x] Instalar pacote Resend
+- [x] Configurar chave de API do Resend
+- [x] Atualizar email.ts para usar Resend em vez de API Forge
+- [x] Criar testes para validar chave de API
+- [x] Testar fluxo completo de envio de email

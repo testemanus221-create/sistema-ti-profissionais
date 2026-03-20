@@ -1,60 +1,39 @@
+import { Resend } from "resend";
 import { ENV } from "./env";
 
 export type EmailPayload = {
   to: string;
   subject: string;
   html: string;
-  from?: string;
 };
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 /**
- * Envia um email usando a API Forge do Manus
+ * Envia um email usando o Resend
  */
 export async function sendEmail(payload: EmailPayload): Promise<boolean> {
-  if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
-    console.warn("[Email] Forge API not configured");
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[Email] Resend API key not configured");
     return false;
   }
 
   try {
-    // Construir endpoint com barra inicial no path
-    const baseUrl = ENV.forgeApiUrl.endsWith("/") ? ENV.forgeApiUrl : `${ENV.forgeApiUrl}/`;
-    const endpoint = new URL("/webdevtoken.v1.WebDevService/SendEmail", baseUrl).toString();
+    console.log(`[Email] Sending email to ${payload.to}`);
 
-    // Preparar payload - NUNCA incluir 'from' pois a API Forge só aceita remetentes verificados
-    // Usar o remetente padrão verificado da plataforma
-    const body: any = {
+    const response = await resend.emails.send({
+      from: "noreply@techconnect.com.br",
       to: payload.to,
       subject: payload.subject,
       html: payload.html,
-    };
-
-    console.log(`[Email] Sending email to ${payload.to} from (default Forge sender)`);
-    console.log(`[Email] Endpoint: ${endpoint}`);
-
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        authorization: `Bearer ${ENV.forgeApiKey}`,
-        "content-type": "application/json",
-        "connect-protocol-version": "1",
-      },
-      body: JSON.stringify(body),
     });
 
-    if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      console.error(
-        `[Email] Failed to send email (${response.status} ${response.statusText})${
-          detail ? `: ${detail}` : ""
-        }`
-      );
-      console.error(`[Email] Request body:`, JSON.stringify(body));
+    if (response.error) {
+      console.error(`[Email] Failed to send email:`, response.error);
       return false;
     }
 
-    console.log(`[Email] Email sent successfully to ${payload.to}`);
+    console.log(`[Email] Email sent successfully to ${payload.to}. ID: ${response.data?.id}`);
     return true;
   } catch (error) {
     console.error("[Email] Error sending email:", error);
@@ -106,7 +85,6 @@ export async function sendPasswordResetEmail(
 
   return sendEmail({
     to: email,
-    from: fromEmail,
     subject: "Código de Recuperação de Senha - TechConnect",
     html,
   });
