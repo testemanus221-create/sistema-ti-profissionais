@@ -11,6 +11,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
  * Envia um email usando o Resend
+ * Em modo de teste, o Resend só permite enviar para o email do proprietário (testemanus221@gmail.com)
  */
 export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
@@ -21,19 +22,26 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   try {
     console.log(`[Email] Sending email to ${payload.to}`);
 
+    // Em modo de teste, redirecionar para email pessoal
+    const toEmail = process.env.NODE_ENV === "production" ? payload.to : "testemanus221@gmail.com";
+    console.log(`[Email] Actual recipient: ${toEmail}`);
+
     const response = await resend.emails.send({
-      from: "noreply@techconnect.com.br",
-      to: payload.to,
+      from: "testemanus221@gmail.com",
+      to: toEmail,
       subject: payload.subject,
       html: payload.html,
     });
 
     if (response.error) {
-      console.error(`[Email] Failed to send email:`, response.error);
+      console.error(`[Email] Failed to send email:`);
+      console.error(`  Error name: ${response.error.name}`);
+      console.error(`  Error message: ${response.error.message}`);
+      console.error(`  Full error:`, JSON.stringify(response.error, null, 2));
       return false;
     }
 
-    console.log(`[Email] Email sent successfully to ${payload.to}. ID: ${response.data?.id}`);
+    console.log(`[Email] Email sent successfully to ${toEmail}. ID: ${response.data?.id}`);
     return true;
   } catch (error) {
     console.error("[Email] Error sending email:", error);
