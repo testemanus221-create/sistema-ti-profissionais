@@ -27,7 +27,7 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
     console.log(`[Email] Actual recipient: ${toEmail}`);
 
     const response = await resend.emails.send({
-      from: "testemanus221@gmail.com",
+      from: "onboarding@resend.dev",
       to: toEmail,
       subject: payload.subject,
       html: payload.html,
